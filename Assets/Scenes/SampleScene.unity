@@ -340,10 +340,11 @@ MonoBehaviour:
   platformPrefabs:
   - {fileID: 5594074752433827094, guid: 46b6458c81fa50241af7f898e6425d9b, type: 3}
   - {fileID: 8046149618966791336, guid: e439886a4f3850040bb298d5e48dc735, type: 3}
-  levelLength: 10
   stepDistance: 2.5
-  startZ: 0
+  generationThreshold: 5
+  removeThreshold: 15
   obstacleChance: 0.3
+  player: {fileID: 2000453528}
 --- !u!4 &1286449403
 Transform:
   m_ObjectHideFlags: 0
