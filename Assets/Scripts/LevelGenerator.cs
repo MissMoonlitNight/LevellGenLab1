@@ -69,7 +69,10 @@ public class LevelGenerator : MonoBehaviour
         float zPos = (spawnedPlatforms.Count == 0) ? 0f :
                      spawnedPlatforms[spawnedPlatforms.Count - 1].transform.position.z + stepDistance;
 
-        Vector3 position = new Vector3(0f, 0f, zPos);
+        //  Добавляем случайное смещение по X (от -1.5 до 1.5)
+        float xOffset = Random.Range(-1.5f, 1.5f);
+
+        Vector3 position = new Vector3(xOffset, 0f, zPos);
 
         // Выбор типа платформы (30% шанс на препятствие)
         int prefabIndex = Random.value < obstacleChance ? 1 : 0;
@@ -78,4 +81,5 @@ public class LevelGenerator : MonoBehaviour
         GameObject newPlatform = Instantiate(platformPrefabs[prefabIndex], position, Quaternion.identity);
         spawnedPlatforms.Add(newPlatform);
     }
+
 }
