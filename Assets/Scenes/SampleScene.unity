@@ -446,6 +446,7 @@ MonoBehaviour:
   - {fileID: 5594074752433827094, guid: 46b6458c81fa50241af7f898e6425d9b, type: 3}
   - {fileID: 8046149618966791336, guid: e439886a4f3850040bb298d5e48dc735, type: 3}
   stepDistance: 2.5
+  xOffsetRange: 1.5
   generationThreshold: 5
   removeThreshold: 15
   obstacleChance: 0.3
@@ -511,7 +512,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!136 &2000453525
 CapsuleCollider:

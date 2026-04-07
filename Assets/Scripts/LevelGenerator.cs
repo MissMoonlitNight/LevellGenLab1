@@ -7,29 +7,41 @@ using System.Collections.Generic;
 public class LevelGenerator : MonoBehaviour
 {
     [Header("Prefabs")]
-    public GameObject[] platformPrefabs; // 0 — обычная, 1 — препятствие
+    public GameObject[] platformPrefabs; // 0 — обычная платформа, 1 — препятствие
+
+    [Header("Materials")]
+    public Material[] basicPlatformMaterials; // Материалы для обычных платформ
+    public Material[] obstacleMaterials;      // Материалы для препятствий
 
     [Header("Generation Settings")]
-    public float stepDistance = 2.5f;           // Расстояние между платформами
-    public float generationThreshold = 5f;      // Дистанция, при которой создаётся новая платформа
-    public float removeThreshold = 15f;         // Дистанция, после которой платформа удаляется
-    public float obstacleChance = 0.3f;         // Шанс препятствия (30%)
+    public float stepDistance = 2.5f;           // Расстояние между центрами платформ по оси Z
+    public float xOffsetRange = 1.5f;           // Максимальное случайное смещение по оси X
+    public float generationThreshold = 5f;      // Дистанция до игрока, при которой создаётся новая платформа
+    public float removeThreshold = 15f;         // Дистанция позади игрока, после которой платформа удаляется
+    public float obstacleChance = 0.3f;         // Вероятность появления препятствия (0.0–1.0)
 
     [Header("References")]
-    public Transform player;                    // Ссылка на игрока
+    public Transform player;                    // Ссылка на трансформ игрока для отслеживания позиции
 
     private List<GameObject> spawnedPlatforms = new List<GameObject>();
-    private float lastGeneratedZ;
 
     private void Start()
     {
+        // Проверка наличия ссылки на игрока
         if (player == null)
         {
-            Debug.LogError("Player reference not set!");
+            Debug.LogError("Player reference not set! Assign player in Inspector.");
             return;
         }
 
-        // Генерируем первые 5 платформ при старте, чтобы игроку было куда идти
+        // Проверка наличия префабов
+        if (platformPrefabs == null || platformPrefabs.Length < 2)
+        {
+            Debug.LogError("Need at least 2 platform prefabs (basic and obstacle)!");
+            return;
+        }
+
+        // Генерация начального сегмента уровня (5 платформ) для старта игрока
         for (int i = 0; i < 5; i++)
         {
             GenerateNextPlatform();
@@ -42,16 +54,16 @@ public class LevelGenerator : MonoBehaviour
 
         float playerZ = player.position.z;
 
-        // Получаем Z-координату последней платформы
+        // Получение Z-координаты последней сгенерированной платформы
         float lastPlatformZ = spawnedPlatforms[spawnedPlatforms.Count - 1].transform.position.z;
 
-        // 1. Генерация новой платформы, если игрок приблизился к краю
+        // Генерация новой платформы, если игрок приблизился к краю текущего уровня
         if (lastPlatformZ - playerZ < generationThreshold)
         {
             GenerateNextPlatform();
         }
 
-        // 2. Удаление платформ, оставшихся далеко позади
+        // Удаление платформ, которые остались далеко позади игрока, для оптимизации памяти
         if (spawnedPlatforms.Count > 0 &&
             spawnedPlatforms[0].transform.position.z < playerZ - removeThreshold)
         {
@@ -65,21 +77,67 @@ public class LevelGenerator : MonoBehaviour
     /// </summary>
     private void GenerateNextPlatform()
     {
-        // Вычисляем позицию Z для новой платформы
+        // Вычисление позиции Z для новой платформы
         float zPos = (spawnedPlatforms.Count == 0) ? 0f :
                      spawnedPlatforms[spawnedPlatforms.Count - 1].transform.position.z + stepDistance;
 
-        //  Добавляем случайное смещение по X (от -1.5 до 1.5)
-        float xOffset = Random.Range(-1.5f, 1.5f);
+        // Случайное смещение по оси X в заданном диапазоне для вариативности трассы
+        float xOffset = Random.Range(-xOffsetRange, xOffsetRange);
 
         Vector3 position = new Vector3(xOffset, 0f, zPos);
 
-        // Выбор типа платформы (30% шанс на препятствие)
+        // Выбор типа платформы: обычная или препятствие, на основе вероятности
         int prefabIndex = Random.value < obstacleChance ? 1 : 0;
 
-        // Создаём платформу
+        // Создание экземпляра платформы в рассчитанной позиции
         GameObject newPlatform = Instantiate(platformPrefabs[prefabIndex], position, Quaternion.identity);
+
+        // Назначение случайного материала в зависимости от типа платформы
+        ApplyRandomMaterial(newPlatform, prefabIndex);
+
         spawnedPlatforms.Add(newPlatform);
     }
 
+    /// <summary>
+    /// Назначает случайный материал платформе в зависимости от её типа.
+    /// </summary>
+    /// <param name="platform">Созданная платформа</param>
+    /// <param name="typeIndex">Тип платформы (0 — обычная, 1 — препятствие)</param>
+    private void ApplyRandomMaterial(GameObject platform, int typeIndex)
+    {
+        Renderer renderer = platform.GetComponent<Renderer>();
+        if (renderer == null)
+        {
+            Debug.LogWarning("Platform has no Renderer component!");
+            return;
+        }
+
+        Material selectedMaterial = null;
+
+        // Выбор массива материалов в зависимости от типа платформы
+        if (typeIndex == 0)
+        {
+            // Обычная платформа — выбираем из basicPlatformMaterials
+            if (basicPlatformMaterials != null && basicPlatformMaterials.Length > 0)
+            {
+                int randomIndex = Random.Range(0, basicPlatformMaterials.Length);
+                selectedMaterial = basicPlatformMaterials[randomIndex];
+            }
+        }
+        else if (typeIndex == 1)
+        {
+            // Препятствие — выбираем из obstacleMaterials
+            if (obstacleMaterials != null && obstacleMaterials.Length > 0)
+            {
+                int randomIndex = Random.Range(0, obstacleMaterials.Length);
+                selectedMaterial = obstacleMaterials[randomIndex];
+            }
+        }
+
+        // Применение материала
+        if (selectedMaterial != null)
+        {
+            renderer.material = selectedMaterial;
+        }
+    }
 }
