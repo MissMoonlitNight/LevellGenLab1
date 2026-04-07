@@ -255,8 +255,8 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 1
+  m_Color: {r: 1, g: 0.9607843, b: 0.8627451, a: 1}
+  m_Intensity: 1.2
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -445,6 +445,13 @@ MonoBehaviour:
   platformPrefabs:
   - {fileID: 5594074752433827094, guid: 46b6458c81fa50241af7f898e6425d9b, type: 3}
   - {fileID: 8046149618966791336, guid: e439886a4f3850040bb298d5e48dc735, type: 3}
+  basicPlatformMaterials:
+  - {fileID: 2100000, guid: 92c320d2b903e5744932d585b6ce2bac, type: 2}
+  - {fileID: 2100000, guid: 6be6759bcc1ff064ebf17d2019cdee2c, type: 2}
+  - {fileID: 2100000, guid: cdbddd88ab6069446b58e5d520fb54cf, type: 2}
+  obstacleMaterials:
+  - {fileID: 2100000, guid: f557fa15791c96c44a09eb157b989680, type: 2}
+  - {fileID: 2100000, guid: 6469fafd26ebd1543a11d72fe0c97c52, type: 2}
   stepDistance: 2.5
   xOffsetRange: 1.5
   generationThreshold: 5
